@@ -1,5 +1,7 @@
 # DeepSeek Search and Fetch Skill
 
+[简体中文](README.zh-CN.md) | English
+
 An installable Agent Skill for using DeepSeek's official Search and Fetch APIs from a compatible agent harness.
 
 ## Why this exists
