@@ -17,6 +17,16 @@ Or copy this repository's `SKILL.md` and `scripts/` into your agent's skills dir
 - Node.js 22 or later
 - A DeepSeek API key with Search/Fetch access
 
+## Compatibility
+
+This is a portable Agent Skill for harnesses that support `SKILL.md` skills and can run local Node.js scripts. Examples include Pi, Codex, Claude Code, Cursor, OpenCode, and VS Code Copilot. The repository has been checked with the `skills` CLI for remote discovery and with the offline Node.js test suite; host-specific execution has not been integration-tested in every harness.
+
+The skill does not install or enable a harness's native web-search feature. It instructs the agent to call DeepSeek's Search/Fetch HTTP APIs directly, so the selected model can be from any provider as long as the harness can run the bundled script and pass its output back to the model.
+
+Native server-side search is a separate integration. DeepSeek's Responses API supports its `web_search` tool with `deepseek-v4-pro`; the harness must send and handle that Responses API tool format. OpenAI likewise exposes its own `web_search` through the Responses API, which a client must explicitly support. A model API key alone does not enable either provider's server-side tools. OpenCode's built-in `websearch` uses OpenCode-hosted search, Exa, or Parallel, rather than automatically routing through DeepSeek Search. See the [DeepSeek Responses API tool support](https://api-docs.deepseek.com/guides/responses_api/), [OpenAI web search API](https://developers.openai.com/api/docs/guides/tools-web-search), and [OpenCode web search providers](https://dev.opencode.ai/v2/docs/websearch/).
+
+If your harness already has the native search integration you want, use that instead of adding another route unless you specifically want DeepSeek Search/Fetch as a separate provider.
+
 ## Configure credentials
 
 Set `DEEPSEEK_API_KEY` in the environment of the agent process. As a local fallback, create `~/.config/deepseek-search/.env`:
