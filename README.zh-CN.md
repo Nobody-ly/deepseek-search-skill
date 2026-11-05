@@ -1,30 +1,34 @@
-# DeepSeek Search and Fetch Skill
+# DeepSeek Search and Fetch
 
 简体中文 | [English](README.md)
 
-一个可安装的 Agent Skill，可在兼容的 agent harness 中调用 DeepSeek 官方 Search 和 Fetch API。
+一组轻量、模型无关的 DeepSeek 官方 Search 和 Fetch API 适配器：包含可安装的 Agent Skill 和可选 MCP server。
 
 ## 为什么需要它
 
 配置 API key 只会选择并认证模型供应商，并不会自动让每个 harness 获得该供应商的服务端网页搜索能力。搜索能力取决于模型 API、harness 对工具协议的支持，以及 harness 配置的搜索服务。Harness 可能自带网页搜索、支持模型供应商的原生搜索，也可能没有配置搜索。
 
-这个 skill 为能够运行本地 Node.js 脚本的 agent，提供一个明确调用 DeepSeek Search 和 Fetch 的选项。搜索使用 DeepSeek 的索引，而 agent 可以继续使用当前模型，无论它来自 DeepSeek 还是其他供应商。它不模拟浏览器，也不让模型生成搜索结果。
+这两种适配方式为 agent 提供了明确调用 DeepSeek Search 和 Fetch 的选项。搜索使用 DeepSeek 的索引，而 agent 可以继续使用当前模型，无论它来自 DeepSeek 还是其他供应商。它们不模拟浏览器，也不让模型生成搜索结果。
 
 ## 设计
 
-Skill 将 DeepSeek 原生 JSON 请求发送到官方 Search 或 Fetch 接口，并将 API 响应正文原样写出。它不调用模型、不总结或过滤结果、不缓存、不重试，也不额外加入 MCP 协议层。Agent 自行决定何时搜索、要抓取哪些结果页面，以及如何在答复中使用返回内容。
+两种适配方式共用同一个 CLI：它将 DeepSeek 原生 JSON 请求发送到官方 Search 或 Fetch 接口，并将 API 响应正文原样写出。它不调用模型、不总结或过滤结果、不缓存，也不重试。Agent Skill 适用于能加载 Agent Skills 并运行脚本的 harness；MCP server 则将相同操作暴露为 MCP 工具。Agent 自行决定何时搜索、要抓取哪些结果页面，以及如何在答复中使用返回内容。
 
-这是一个小型适配器，不是研究代理，也不打算取代所有 harness 自带的搜索功能。当你希望把 DeepSeek Search/Fetch 作为独立于当前模型的检索后端时，可以使用它。如果 harness 已提供你需要的搜索服务和行为，继续使用现有集成即可。
+这是一组小型适配器，不是研究代理，也不打算取代所有 harness 自带的搜索功能。当你希望把 DeepSeek Search/Fetch 作为独立于当前模型的检索后端时，可以选择其中一种接入方式。如果 harness 已提供你需要的搜索服务和行为，继续使用现有集成即可。
 
 ## 安装
 
-通过开源的 [`skills` CLI](https://github.com/vercel-labs/skills) 安装：
+通过开源的 [`skills` CLI](https://github.com/vercel-labs/skills) 安装 Agent Skill：
 
 ```powershell
 npx skills add Nobody-ly/deepseek-search-skill --skill deepseek-search --global
 ```
 
-也可以将仓库中的 `SKILL.md` 和 `scripts/` 复制到 agent 的 skills 目录。该 skill 遵循开放的 Agent Skills 文件夹格式，无需安装 npm 包。
+也可以将 `skills/deepseek-search/SKILL.md` 和其中的 `scripts/` 目录复制到 agent 的 skills 目录。该 skill 遵循开放的 Agent Skills 文件夹格式，无需安装 npm 包。
+
+### MCP server
+
+可选 MCP stdio server 位于 [`mcp/deepseek-search-mcp`](mcp/deepseek-search-mcp/README.md)。克隆仓库后，在该目录运行 `npm install`，再配置 MCP host 启动 `server.mjs`。MCP server 会调用与 skill 相同的 CLI。
 
 ## 环境要求
 
@@ -55,14 +59,14 @@ DEEPSEEK_API_KEY=your-key
 
 ## 使用
 
-该 skill 将 DeepSeek 原生 JSON 请求通过标准输入传给 CLI：
+该 skill 将 DeepSeek 原生 JSON 请求通过标准输入传给 CLI。以下示例从仓库根目录运行：
 
 ```powershell
-'{"query":"DeepSeek Search API","count":5,"need_content":false}' | node .\scripts\deepseek-search.mjs search
-'{"url":"https://api-docs.deepseek.com/guides/search/"}' | node .\scripts\deepseek-search.mjs fetch
+'{"query":"DeepSeek Search API","count":5,"need_content":false}' | node .\skills\deepseek-search\scripts\deepseek-search.mjs search
+'{"url":"https://api-docs.deepseek.com/guides/search/"}' | node .\skills\deepseek-search\scripts\deepseek-search.mjs fetch
 ```
 
-Harness 调用脚本时，应根据此 `SKILL.md` 所在目录解析脚本路径。
+Harness 调用 skill 脚本时，应根据 `skills/deepseek-search/SKILL.md` 所在目录解析脚本路径。
 
 Search 接受 DeepSeek 原生字段：`query`、`count`、`ori_question`、`localization` 和 `need_content`。Fetch 接受 `url`。请求分别发送到 `https://api.deepseek.com/v1/tools/search` 或 `/v1/tools/fetch`。
 
@@ -82,4 +86,4 @@ npm test
 
 ## 项目范围
 
-这是一个非官方社区 skill，直接调用 DeepSeek 有文档说明的 HTTP API。它不是 MCP server，也不隶属于 DeepSeek。
+这是一个非官方社区项目，直接调用 DeepSeek 有文档说明的 HTTP API，并提供 Agent Skill 与可选 MCP server 两种接入方式。本项目不隶属于 DeepSeek。

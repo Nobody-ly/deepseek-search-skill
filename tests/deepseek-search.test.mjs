@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { Readable } from "node:stream";
 import test from "node:test";
 
-import { runCli } from "../scripts/deepseek-search.mjs";
+import { runCli } from "../skills/deepseek-search/scripts/deepseek-search.mjs";
 
 function output() {
 	let value = "";

@@ -1,30 +1,34 @@
-# DeepSeek Search and Fetch Skill
+# DeepSeek Search and Fetch
 
 [简体中文](README.zh-CN.md) | English
 
-An installable Agent Skill for using DeepSeek's official Search and Fetch APIs from a compatible agent harness.
+Small, model-independent adapters for DeepSeek's official Search and Fetch APIs: an installable Agent Skill and an optional MCP server.
 
 ## Why this exists
 
 An API key selects and authenticates a model provider; it does not by itself give every harness the provider's server-side web search. Search availability depends on the model API, the harness's tool support, and the search provider the harness is configured to use. A harness may have its own web search, support a model provider's native search, or have no search configured.
 
-This skill makes DeepSeek Search and Fetch an explicit retrieval option for agents that can run a local Node.js script. The search can use DeepSeek's index while the agent continues using its current model, from DeepSeek or another provider. It does not impersonate a browser or ask a model to generate search results.
+These adapters make DeepSeek Search and Fetch explicit retrieval options for agents. Search can use DeepSeek's index while the agent continues using its current model, from DeepSeek or another provider. They do not impersonate a browser or ask a model to generate search results.
 
 ## Design
 
-The skill sends DeepSeek's native JSON request to the documented Search or Fetch endpoint and prints the API response body unchanged. It does not call a model, summarize or filter results, cache, retry, or add an MCP protocol layer. The agent decides when to search, which returned pages to fetch, and how to use the results in its answer.
+Both adapters share the bundled CLI, which sends DeepSeek's native JSON request to the documented Search or Fetch endpoint and prints the API response body unchanged. It does not call a model, summarize or filter results, cache, or retry. The skill is for harnesses that load Agent Skills and run scripts; the MCP server exposes the same operations as MCP tools. The agent decides when to search, which returned pages to fetch, and how to use the results in its answer.
 
-This is a small adapter, not a research agent or a replacement for every harness's built-in search. Use it when you want DeepSeek Search/Fetch as a separate, model-independent retrieval backend. If your harness already provides the search provider and behavior you want, keep using that integration.
+These are small adapters, not a research agent or a replacement for every harness's built-in search. Use either entry point when you want DeepSeek Search/Fetch as a separate, model-independent retrieval backend. If your harness already provides the search provider and behavior you want, keep using that integration.
 
 ## Install
 
-Install with the open-source [`skills` CLI](https://github.com/vercel-labs/skills):
+Install the skill with the open-source [`skills` CLI](https://github.com/vercel-labs/skills):
 
 ```powershell
 npx skills add Nobody-ly/deepseek-search-skill --skill deepseek-search --global
 ```
 
-Or copy this repository's `SKILL.md` and `scripts/` into your agent's skills directory. The skill follows the open Agent Skills folder format and does not require an npm package install.
+Or copy `skills/deepseek-search/SKILL.md` and its `scripts/` directory into your agent's skills directory. The skill follows the open Agent Skills folder format and does not require an npm package install.
+
+### MCP server
+
+The optional MCP stdio server is in [`mcp/deepseek-search-mcp`](mcp/deepseek-search-mcp/README.md). Clone the repository, run `npm install` in that directory, and configure your MCP host to launch `server.mjs`. The server delegates to the same CLI as the skill.
 
 ## Requirements
 
@@ -58,11 +62,11 @@ On Windows, `~` resolves to your user profile directory. Keep the key outside th
 The skill runs the bundled CLI with a native JSON request on stdin:
 
 ```powershell
-'{"query":"DeepSeek Search API","count":5,"need_content":false}' | node .\scripts\deepseek-search.mjs search
-'{"url":"https://api-docs.deepseek.com/guides/search/"}' | node .\scripts\deepseek-search.mjs fetch
+'{"query":"DeepSeek Search API","count":5,"need_content":false}' | node .\skills\deepseek-search\scripts\deepseek-search.mjs search
+'{"url":"https://api-docs.deepseek.com/guides/search/"}' | node .\skills\deepseek-search\scripts\deepseek-search.mjs fetch
 ```
 
-When your harness invokes the script, resolve its path relative to this `SKILL.md`.
+When a harness invokes the skill script, resolve its path relative to `skills/deepseek-search/SKILL.md`.
 
 Search accepts DeepSeek's native fields: `query`, `count`, `ori_question`, `localization`, and `need_content`. Fetch accepts `url`. Requests go to `https://api.deepseek.com/v1/tools/search` or `/v1/tools/fetch`.
 
@@ -82,4 +86,4 @@ Tests use a mocked HTTP transport and do not require an API key or make network 
 
 ## Scope
 
-This is an unofficial community skill. It calls DeepSeek's documented HTTP API directly. It is not an MCP server and is not affiliated with DeepSeek.
+This is an unofficial community project that calls DeepSeek's documented HTTP API directly and provides both an Agent Skill and an optional MCP server. It is not affiliated with DeepSeek.
