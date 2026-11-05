@@ -2,6 +2,8 @@
 
 [简体中文](README.zh-CN.md) | English
 
+[![skills.sh installs](https://skills.sh/b/Nobody-ly/deepseek-search-skill)](https://skills.sh/Nobody-ly/deepseek-search-skill)
+
 Small, model-independent adapters for DeepSeek's official Search and Fetch APIs: an installable Agent Skill and an optional MCP server.
 
 ## Why this exists

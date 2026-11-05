@@ -2,6 +2,8 @@
 
 简体中文 | [English](README.md)
 
+[![skills.sh 安装量](https://skills.sh/b/Nobody-ly/deepseek-search-skill)](https://skills.sh/Nobody-ly/deepseek-search-skill)
+
 一组轻量、模型无关的 DeepSeek 官方 Search 和 Fetch API 适配器：包含可安装的 Agent Skill 和可选 MCP server。
 
 ## 为什么需要它
