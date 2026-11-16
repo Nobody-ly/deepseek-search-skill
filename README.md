@@ -4,7 +4,7 @@
 
 [![skills.sh installs](https://skills.sh/b/Nobody-ly/deepseek-search-skill)](https://skills.sh/Nobody-ly/deepseek-search-skill)
 [![Tests](https://github.com/Nobody-ly/deepseek-search-skill/actions/workflows/test.yml/badge.svg)](https://github.com/Nobody-ly/deepseek-search-skill/actions/workflows/test.yml)
-[![M8ven Score](https://m8ven.ai/badge/mcp/nobody-ly/deepseek-search-skill-dv3daa?v=24d65b14660f079a8bddfbe85b218f40)](https://m8ven.ai/mcp/nobody-ly/deepseek-search-skill-dv3daa?s=readme)
+[![M8ven Verified](https://m8ven.ai/badge/mcp/nobody-ly/deepseek-search-skill?variant=verified)](https://m8ven.ai/mcp/nobody-ly/deepseek-search-skill?s=readme)
 
 Small, model-independent adapters for DeepSeek's official Search and Fetch APIs: an installable Agent Skill and an optional MCP server.
 
