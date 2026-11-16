@@ -84,4 +84,12 @@ test("the documented Node entrypoint starts as an MCP stdio server", async (t) =
 	await client.connect(transport);
 	const { tools } = await client.listTools();
 	assert.deepEqual(tools.map(({ name }) => name).sort(), ["fetch", "search"]);
+	for (const tool of tools) {
+		assert.deepEqual(tool.annotations, {
+			readOnlyHint: true,
+			destructiveHint: false,
+			idempotentHint: true,
+			openWorldHint: true,
+		});
+	}
 });

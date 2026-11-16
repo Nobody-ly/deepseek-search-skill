@@ -3,6 +3,7 @@
 简体中文 | [English](README.md)
 
 [![skills.sh 安装量](https://skills.sh/b/Nobody-ly/deepseek-search-skill)](https://skills.sh/Nobody-ly/deepseek-search-skill)
+[![测试](https://github.com/Nobody-ly/deepseek-search-skill/actions/workflows/test.yml/badge.svg)](https://github.com/Nobody-ly/deepseek-search-skill/actions/workflows/test.yml)
 
 一组轻量、模型无关的 DeepSeek 官方 Search 和 Fetch API 适配器：包含可安装的 Agent Skill 和可选 MCP server。
 
@@ -26,7 +27,7 @@
 npx skills add Nobody-ly/deepseek-search-skill --skill deepseek-search --global
 ```
 
-也可以将 `skills/deepseek-search/SKILL.md` 和其中的 `scripts/` 目录复制到 agent 的 skills 目录。该 skill 遵循开放的 Agent Skills 文件夹格式，无需安装 npm 包。
+也可以将整个 `skills/deepseek-search/` 目录（包括 `LICENSE.txt`）复制到 agent 的 skills 目录。该 skill 遵循开放的 Agent Skills 文件夹格式，无需安装 npm 包。
 
 ### MCP server
 
@@ -86,6 +87,12 @@ npm test
 
 测试使用模拟 HTTP 传输，无需 API key，也不会发起网络请求。
 
+GitHub Actions 使用 Node.js 22 在 Windows 和 Linux 上运行 CLI 与 MCP 测试。从新克隆的仓库运行完整测试前，先执行 `npm ci --prefix mcp/deepseek-search-mcp --ignore-scripts` 安装 MCP 依赖。
+
 ## 项目范围
 
 这是一个非官方社区项目，直接调用 DeepSeek 有文档说明的 HTTP API，并提供 Agent Skill 与可选 MCP server 两种接入方式。本项目不隶属于 DeepSeek。
+
+## 许可证
+
+[MIT](LICENSE)。可单独安装的 skill 在 `LICENSE.txt` 中附带同一份许可证。DeepSeek API 的服务条款和使用费用另行适用。

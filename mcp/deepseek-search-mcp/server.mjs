@@ -40,6 +40,12 @@ export function createMcpServer(runCliImpl = callCli) {
 		"search",
 		{
 			description: "Search the web using DeepSeek's official Search API and return its raw JSON response.",
+			annotations: {
+				readOnlyHint: true,
+				destructiveHint: false,
+				idempotentHint: true,
+				openWorldHint: true,
+			},
 			inputSchema: z.object({
 				query: z.string().min(1).max(128),
 				count: z.number().int().min(1).max(50).optional(),
@@ -55,6 +61,12 @@ export function createMcpServer(runCliImpl = callCli) {
 		"fetch",
 		{
 			description: "Fetch a web page using DeepSeek's official Fetch API and return its raw JSON response.",
+			annotations: {
+				readOnlyHint: true,
+				destructiveHint: false,
+				idempotentHint: true,
+				openWorldHint: true,
+			},
 			inputSchema: z.object({
 				url: z.string().min(1).max(8192),
 			}).passthrough(),

@@ -3,6 +3,7 @@
 [简体中文](README.zh-CN.md) | English
 
 [![skills.sh installs](https://skills.sh/b/Nobody-ly/deepseek-search-skill)](https://skills.sh/Nobody-ly/deepseek-search-skill)
+[![Tests](https://github.com/Nobody-ly/deepseek-search-skill/actions/workflows/test.yml/badge.svg)](https://github.com/Nobody-ly/deepseek-search-skill/actions/workflows/test.yml)
 
 Small, model-independent adapters for DeepSeek's official Search and Fetch APIs: an installable Agent Skill and an optional MCP server.
 
@@ -26,7 +27,7 @@ Install the skill with the open-source [`skills` CLI](https://github.com/vercel-
 npx skills add Nobody-ly/deepseek-search-skill --skill deepseek-search --global
 ```
 
-Or copy `skills/deepseek-search/SKILL.md` and its `scripts/` directory into your agent's skills directory. The skill follows the open Agent Skills folder format and does not require an npm package install.
+Or copy the entire `skills/deepseek-search/` directory, including `LICENSE.txt`, into your agent's skills directory. The skill follows the open Agent Skills folder format and does not require an npm package install.
 
 ### MCP server
 
@@ -86,6 +87,12 @@ npm test
 
 Tests use a mocked HTTP transport and do not require an API key or make network requests.
 
+GitHub Actions runs the CLI and MCP tests on Windows and Linux with Node.js 22. To run the full suite from a fresh clone, first install the MCP dependencies with `npm ci --prefix mcp/deepseek-search-mcp --ignore-scripts`.
+
 ## Scope
 
 This is an unofficial community project that calls DeepSeek's documented HTTP API directly and provides both an Agent Skill and an optional MCP server. It is not affiliated with DeepSeek.
+
+## License
+
+[MIT](LICENSE). The standalone skill includes the same license in `LICENSE.txt`. DeepSeek's API terms and usage charges apply separately.

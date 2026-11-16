@@ -1,5 +1,6 @@
 ---
 name: deepseek-search
+license: MIT
 description: Search the web and fetch page content with DeepSeek's official Search and Fetch APIs using native JSON requests. Use when a Node.js 22+ agent harness needs direct DeepSeek search results or fetched page content without model-generated summaries.
 ---
 
