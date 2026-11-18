@@ -34,7 +34,7 @@ The server exposes two tools:
 
 The MCP response contains the DeepSeek API response body as text without summarization or filtering. API request errors are returned as MCP tool errors with the original response body when available.
 
-Both tools declare all four MCP behavior hints: read-only, non-destructive, idempotent, and open-world. These describe retrieval behavior, not billing or result stability: each invocation sends a new API request, can incur a separate charge, and can return updated web content. The server does not cache or retry requests.
+Both tools declare all four MCP behavior hints: read-only, non-destructive, non-idempotent, and open-world. Each successful invocation is a separate billable API request, and results can change between calls. The server does not cache or retry requests.
 
 ## Test
 

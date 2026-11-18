@@ -88,7 +88,7 @@ test("the documented Node entrypoint starts as an MCP stdio server", async (t) =
 		assert.deepEqual(tool.annotations, {
 			readOnlyHint: true,
 			destructiveHint: false,
-			idempotentHint: true,
+			idempotentHint: false,
 			openWorldHint: true,
 		});
 	}

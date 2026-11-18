@@ -43,7 +43,7 @@ export function createMcpServer(runCliImpl = callCli) {
 			annotations: {
 				readOnlyHint: true,
 				destructiveHint: false,
-				idempotentHint: true,
+				idempotentHint: false,
 				openWorldHint: true,
 			},
 			inputSchema: z.object({
@@ -64,7 +64,7 @@ export function createMcpServer(runCliImpl = callCli) {
 			annotations: {
 				readOnlyHint: true,
 				destructiveHint: false,
-				idempotentHint: true,
+				idempotentHint: false,
 				openWorldHint: true,
 			},
 			inputSchema: z.object({
