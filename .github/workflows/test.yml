@@ -25,5 +25,7 @@ jobs:
           node-version: 22
       - name: Install MCP dependencies
         run: npm ci --prefix mcp/deepseek-search-mcp --ignore-scripts
+      - name: Install Web MCP dependencies
+        run: npm ci --prefix mcp/deepseek-web-mcp --ignore-scripts
       - name: Run offline CLI and MCP tests
         run: npm test

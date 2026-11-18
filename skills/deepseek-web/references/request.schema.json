@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DeepSeek Web Tools: common Chat Completions request fields",
+  "description": "Guide checked 2026-11-18 against https://api-docs.deepseek.com/api/create-chat-completion/ and https://api-docs.deepseek.com/guides/web_tools/. Not a complete upstream schema. Additional fields are passed through; upstream validation is authoritative.",
+  "type": "object",
+  "required": ["model", "messages"],
+  "additionalProperties": true,
+  "properties": {
+    "model": {
+      "type": "string",
+      "description": "The official Web Tools guide currently specifies deepseek-flash.",
+      "examples": ["deepseek-flash"]
+    },
+    "messages": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["role", "content"],
+        "additionalProperties": true,
+        "properties": {
+          "role": {"type": "string", "enum": ["system", "user", "assistant", "tool", "latest_reminder"]},
+          "content": {"type": ["string", "array", "null"]},
+          "reasoning_content": {"type": ["string", "null"]},
+          "server_tool_calls": {"type": "array", "description": "Pass prior assistant server_tool_calls back unchanged, including signatures."}
+        }
+      }
+    },
+    "tools": {
+      "type": ["array", "null"],
+      "description": "Declare deepseek_web_search, deepseek_read_url, or both. The server decides whether to use them; each web tool may appear only once. Other officially supported tool fields can pass through, but this script does not execute client-side tools.",
+      "items": {
+        "type": "object",
+        "required": ["type"],
+        "additionalProperties": true,
+        "properties": {
+          "type": {"type": "string", "examples": ["deepseek_web_search", "deepseek_read_url"]}
+        }
+      }
+    },
+    "thinking": {
+      "type": ["object", "null"],
+      "required": ["type"],
+      "additionalProperties": true,
+      "properties": {"type": {"type": "string", "enum": ["enabled", "disabled"]}},
+      "description": "Overrides reasoning_effort for selecting thinking versus non-thinking. If both are omitted, thinking is enabled."
+    },
+    "reasoning_effort": {
+      "type": "string",
+      "enum": ["none", "low", "high", "max", "minimal", "medium", "xhigh"],
+      "description": "Native values are none/low/high/max; the API also accepts minimal as low, and medium/xhigh as high. Default effort is high."
+    },
+    "max_tokens": {"type": ["integer", "null"], "minimum": 1, "maximum": 393216},
+    "stream": {"type": ["boolean", "null"], "enum": [false, null], "description": "This CLI supports non-streaming responses only; may be omitted."},
+    "tool_choice": {
+      "type": ["string", "object", "null"],
+      "description": "auto leaves the decision to the model; none disables tools. With web tools, required is treated as auto. A web tool cannot be forced by name."
+    },
+    "safety_check": {
+      "type": ["object", "null"],
+      "required": ["level"],
+      "additionalProperties": true,
+      "properties": {"level": {"type": "string", "enum": ["low", "high"]}}
+    },
+    "title": {
+      "type": ["object", "null"],
+      "additionalProperties": true,
+      "properties": {"enabled": {"type": "boolean"}}
+    }
+  },
+  "examples": [
+    {
+      "model": "deepseek-flash",
+      "messages": [{"role": "user", "content": "What changed in the latest DeepSeek API release? Check official sources."}],
+      "thinking": {"type": "disabled"},
+      "tools": [{"type": "deepseek_web_search"}],
+      "stream": false
+    },
+    {
+      "model": "deepseek-flash",
+      "messages": [{"role": "user", "content": "Compare the latest DeepSeek web tools and standalone Search/Fetch APIs using official documentation."}],
+      "thinking": {"type": "enabled"},
+      "reasoning_effort": "high",
+      "tools": [{"type": "deepseek_web_search"}, {"type": "deepseek_read_url"}],
+      "stream": false
+    },
+    {
+      "model": "deepseek-flash",
+      "messages": [{"role": "user", "content": "Read https://api-docs.deepseek.com/guides/web_tools/ and explain how URL reading is enabled."}],
+      "thinking": {"type": "disabled"},
+      "tools": [{"type": "deepseek_read_url"}],
+      "stream": false
+    }
+  ]
+}

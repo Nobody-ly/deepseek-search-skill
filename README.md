@@ -1,4 +1,4 @@
-# DeepSeek Search and Fetch
+# DeepSeek API Skills
 
 [简体中文](README.zh-CN.md) | English
 
@@ -6,7 +6,7 @@
 [![Tests](https://github.com/Nobody-ly/deepseek-search-skill/actions/workflows/test.yml/badge.svg)](https://github.com/Nobody-ly/deepseek-search-skill/actions/workflows/test.yml)
 [![M8ven Verified](https://m8ven.ai/badge/mcp/nobody-ly/deepseek-search-skill?variant=verified)](https://m8ven.ai/mcp/nobody-ly/deepseek-search-skill?s=readme)
 
-Small, model-independent adapters for DeepSeek's official Search and Fetch APIs: an installable Agent Skill and an optional MCP server.
+Small adapters for DeepSeek's official APIs. Both standalone Search/Fetch and model-driven Web Tools are available through an Agent Skill or an MCP server.
 
 ## Why this exists
 
@@ -16,11 +16,40 @@ These adapters make DeepSeek Search and Fetch explicit retrieval options for age
 
 ## Design
 
-Both adapters share the bundled CLI, which sends DeepSeek's native JSON request to the documented Search or Fetch endpoint and prints the API response body unchanged. It does not call a model, summarize or filter results, cache, or retry. The skill is for harnesses that load Agent Skills and run scripts; the MCP server exposes the same operations as MCP tools. The agent decides when to search, which returned pages to fetch, and how to use the results in its answer.
+Both adapters share the bundled CLI, which sends DeepSeek's native JSON request to the documented Search or Fetch endpoint and prints the API response body unchanged. It does not call a model, summarize or filter results, cache, or retry. Each successful Search or Fetch request is billed separately. The skill is for harnesses that load Agent Skills and run scripts; the MCP server exposes the same operations as MCP tools. In either case, the agent decides when to search, which returned pages to fetch, and how to use the results in its answer.
 
 These are small adapters, not a research agent or a replacement for every harness's built-in search. Use either entry point when you want DeepSeek Search/Fetch as a separate, model-independent retrieval backend. If your harness already provides the search provider and behavior you want, keep using that integration.
 
-## Install
+## Skills
+
+| Skill | API | Result | Entry points |
+| --- | --- | --- | --- |
+| [`deepseek-search`](skills/deepseek-search/SKILL.md) | Standalone Search / Fetch | Raw retrieval JSON | Skill or MCP |
+| [`deepseek-web`](skills/deepseek-web/SKILL.md) | Chat Completions with official Web Tools | Raw completion body, including the answer, citations and tool records | Skill or MCP |
+
+Choose Skill or MCP for the same capability; installing both duplicates the entry points. The Design section above describes the existing Search/Fetch adapters.
+
+`deepseek-web` covers web search, deep thinking search and URL questions using the official `tools` and `thinking` fields. It sends one non-streaming request without adding a prompt, model defaults, tool declarations or result processing. Common native fields and complete request examples are in its [request schema](skills/deepseek-web/references/request.schema.json). Model tokens and actual tool use are billed by DeepSeek.
+
+Live-tested against the official API on 2026-11-18: all three examples completed their corresponding server tools (`search`, `deep_search`, `read_link`). Each invocation sent one unchanged request and returned a byte-identical response body. Tool execution and generated answers remain controlled by DeepSeek.
+
+The Web MCP entry point was also live-tested through an MCP stdio client for URL reading. Offline tests cover all three modes through MCP and verify native-field passthrough, unchanged response text and error handling.
+
+The Web Tools Skill includes its own script and license, requires Node.js 22+, and reuses `DEEPSEEK_API_KEY` or `~/.config/deepseek-search/.env`. Its optional `DEEPSEEK_BASE_URL` defaults to the official API origin. Existing Search/Fetch behavior is unchanged; its API URL remains fixed. The two MCP servers are separate entry points for the two APIs.
+
+## Install Web Tools
+
+Choose the Skill:
+
+```powershell
+npx skills add Nobody-ly/deepseek-search-skill --skill deepseek-web --global
+```
+
+Or copy the entire `skills/deepseek-web/` folder into your harness's skills directory.
+
+For MCP instead, follow [`mcp/deepseek-web-mcp`](mcp/deepseek-web-mcp/README.md). Clone the whole repository, run `npm ci --prefix mcp/deepseek-web-mcp --ignore-scripts`, and configure your MCP host to launch that directory's `server.mjs`. It exposes one `web` tool with native Chat Completions fields, reusing the Skill's script and schema. Your main harness can use any model; this API call separately uses DeepSeek's model and bills model tokens and server-side tools.
+
+## Install Search/Fetch
 
 Install the skill with the open-source [`skills` CLI](https://github.com/vercel-labs/skills):
 
@@ -45,7 +74,21 @@ This uses the portable Agent Skills folder format and a Node.js CLI. It is inten
 
 The script calls DeepSeek's Search/Fetch HTTP APIs directly. The model used by the harness can be from any provider, as long as the harness can execute the script and return its output to that model. This is separate from a provider-native server-side search tool, which must be supported by both the API and the harness.
 
-For example, DeepSeek's Responses API `web_search` currently requires `deepseek-v4-pro` and a harness that sends and handles the Responses tool format. OpenAI's Responses API also offers its own `web_search`, which likewise needs client support. OpenCode's built-in `websearch` uses its configured OpenCode, Exa, or Parallel search path; it does not automatically mean DeepSeek Search. See the [DeepSeek Responses API tool support](https://api-docs.deepseek.com/guides/responses_api/), [OpenAI web search API](https://developers.openai.com/api/docs/guides/tools-web-search), and [OpenCode web search providers](https://dev.opencode.ai/v2/docs/websearch/).
+## Native DeepSeek tools or these adapters?
+
+DeepSeek now offers server-side web tools as well as standalone Search and Fetch APIs. With a compatible DeepSeek model and API protocol, enable `deepseek_web_search` for model-directed web search (including image search) and optionally `deepseek_read_url` for reading links in the user's message. DeepSeek performs the search and assembles the results into the model context. The current Web Tools guide documents these tools for the `deepseek-flash` model across Messages, Responses, and Chat Completions APIs. The harness must send the supported tool declarations and handle the protocol's response format.
+
+DeepSeek's own DeepSeek Harness also ships the first-party `@deepseek-ai/dsh-web-deepseek-api` plugin. It connects the standalone Search and Fetch APIs to that harness's web-provider layer, without an extra model request. DeepSeek Harness separately supports loading Agent Skills and connecting external MCP servers; those generic capabilities do not make this repository an official DeepSeek package.
+
+Choose the integration that fits the model and harness:
+
+- DeepSeek model plus a harness/API integration that supports DeepSeek's server tools: use the native web tools. No Agent Skill or MCP adapter is needed for that path.
+- DeepSeek Harness: prefer its first-party `@deepseek-ai/dsh-web-deepseek-api` provider for direct Search/Fetch integration.
+- Any model plus a harness that can discover Agent Skills and run local scripts: use this Skill.
+- Any model plus an MCP host: use this MCP server.
+- A custom application that needs direct control over requests and raw responses: call the standalone Search/Fetch APIs or use the bundled CLI.
+
+Codex has a separate DeepSeek provider integration with Alpha Search. When Codex is configured to use DeepSeek and Alpha Search is enabled, this project overlaps for search in that Codex setup. This repository remains useful in Codex when you want an explicit tool backed by DeepSeek Search while using another model provider. OpenCode's built-in `websearch` uses its configured OpenCode, Exa, or Parallel search path; it does not automatically mean DeepSeek Search. See the [DeepSeek Web Tools guide](https://api-docs.deepseek.com/guides/web_tools/), [DeepSeek Harness Search/Fetch provider](https://github.com/deepseek-ai/deepseek-harness/tree/master/packages/web/web-deepseek-api), [DeepSeek Harness Skill loader](https://github.com/deepseek-ai/deepseek-harness/tree/master/packages/skill/skill-filesystem), [DeepSeek Harness MCP client](https://github.com/deepseek-ai/deepseek-harness/tree/master/packages/mcp/mcp-client), [Codex integration](https://api-docs.deepseek.com/quick_start/agent_integrations/codex/), [OpenAI web search API](https://developers.openai.com/api/docs/guides/tools-web-search), and [OpenCode web search providers](https://dev.opencode.ai/v2/docs/websearch/).
 
 ## Related approaches
 
@@ -86,9 +129,15 @@ DeepSeek charges for successful Search and Fetch requests. Empty search results,
 npm test
 ```
 
-Tests use a mocked HTTP transport and do not require an API key or make network requests.
+Tests use mocked HTTP or a local HTTP server and do not require an API key or contact the official API.
 
-GitHub Actions runs the CLI and MCP tests on Windows and Linux with Node.js 22. To run the full suite from a fresh clone, first install the MCP dependencies with `npm ci --prefix mcp/deepseek-search-mcp --ignore-scripts`.
+GitHub Actions runs the CLI and MCP tests on Windows and Linux with Node.js 22. To run the full suite from a fresh clone, first install both MCP packages:
+
+```powershell
+npm ci --prefix mcp/deepseek-search-mcp --ignore-scripts
+npm ci --prefix mcp/deepseek-web-mcp --ignore-scripts
+npm test
+```
 
 ## Scope
 
